@@ -1,61 +1,21 @@
-const Koa = require('koa')
-const Router = require('koa-router')
-const app = new Koa()
-const router = new Router()
+const Koa = require('koa');
+const cors = require('koa-cors');
+const koaBody = require('koa-body');
+const bodyParser = require('koa-bodyparser');
 
-const views = require('koa-views')
-const co = require('co')
-const convert = require('koa-convert')
-const json = require('koa-json')
-const onerror = require('koa-onerror')
-const bodyparser = require('koa-bodyparser')
-const logger = require('koa-logger')
-const debug = require('debug')('koa2:server')
-const path = require('path')
+const app = new Koa();
 
-const config = require('./config')
-const routes = require('./routes')
+const router = require('./routers/index');
 
-const port = process.env.PORT || config.port
+// 处理跨域问题
+app.use(cors());
 
-// error handler
-onerror(app)
+// 处理原生的node还是koa都无法直接解析request的body
+app.use(koaBody()).use(bodyParser());
 
-// middlewares
-app.use(bodyparser())
-  .use(json())
-  .use(logger())
-  .use(require('koa-static')(__dirname + '/public'))
-  .use(views(path.join(__dirname, '/views'), {
-    options: {settings: {views: path.join(__dirname, 'views')}},
-    map: {'hjs': 'hogan'},
-    extension: 'hjs'
-  }))
-  .use(router.routes())
-  .use(router.allowedMethods())
+// 加载路由中间件
+app.use(router.routes()).use(router.allowedMethods());
 
-// logger
-app.use(async (ctx, next) => {
-  const start = new Date()
-  await next()
-  const ms = new Date() - start
-  console.log(`${ctx.method} ${ctx.url} - $ms`)
-})
-
-router.get('/', async (ctx, next) => {
-  // ctx.body = 'Hello World'
-  ctx.state = {
-    title: 'Koa2'
-  }
-  await ctx.render('index', ctx.state)
-})
-
-routes(router)
-app.on('error', function(err, ctx) {
-  console.log(err)
-  logger.error('server error', err, ctx)
-})
-
-module.exports = app.listen(config.port, () => {
-  console.log(`Listening on http://localhost:${config.port}`)
+app.listen(3000,()=>{
+    console.log('http://localhost:3000')
 })
