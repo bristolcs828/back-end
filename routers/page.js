@@ -19,8 +19,9 @@ router
     })
     .post('/post', async (ctx, next) => {
         // Koa2 中 post方法 通过 ctx.request.body 来获取前端传来的参数值
-        // entity.save(ctx.request.body)
-        console.log(123456)
+        const res = ctx.request.body
+        console.log(ctx.request.body)
+        entity.save(res)
         ctx.response.body = { mgs: "提交成功", start: 200 };
     })
     .get('/remove', async ctx => {
