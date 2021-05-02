@@ -14,7 +14,7 @@ router
           .query("register", userName)
           .then(res => {
               if(res.length === 0){
-                newUser.tags = ["eat", "clothes", "traffic", "room"]
+                newUser.tags = [{id : 1, name: "clothes"}, {id : 2, name: "eat"}, {id : 3, name: "room"}, {id : 4, name: "traffic"}]
                 newUser.list = []
                 newUser.sign = 0
                 entity.save(newUser)
